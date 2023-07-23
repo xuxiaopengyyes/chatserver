@@ -89,7 +89,150 @@ int main(int argc, int** argv)
     //main线程用于接收用户输入，负责发送数据
     for(;;)
     {
-        
+        cout<< "======================"<<endl;
+        cout<< "1. login" << endl;
+        cout<< "2. register" << endl;
+        cout<< "3. quit" << endl;
+        cout<< "======================"
+        cout<< "choice:";
+        int choice = 0;
+        cin >> choice;
+        cin.get(); //读掉缓冲区残留的回车
+
+        switch (choice)
+        {
+        case 1://login
+        {
+            int id = 0;
+            char pwd[50] = {0};
+            cout << "userid";
+            cin >> id;
+            cin.get();
+            cout << "userpassword";
+            cin.getline(pwd, 50);
+
+            json js;
+            js["msgid"] = LOGIN_MSG;
+            js["id"] = id;
+            js["password"] = pwd;
+            string request = js.dump();
+
+            g_isLoginSuccess = false;
+
+            int len = send(clientfd, request.c_str(), strlen(request.c_str()) + 1, 0);
+            if(len == -1)
+            {
+                cerr << "send login msg error:" << request <<endl;
+            }
+
+            sem_wait(&rwsem);//等待信号量，由子线程处理完登录的响应消息后，通知这里
+
+            if(g_isLoginSuccess)
+            {
+                //进入聊天主页面
+                isMainMenuRunning = true;
+                mainMenu(clientfd);
+            }
+        }
+        break;
+        case 2:// register
+        {
+            char name[50] = {0};
+            char pwd[50] ={0};
+            cout << "username:";
+            cin.getline(name, 50);
+            cout << "userpassword:";
+            cin.getline(pwd, 50);
+
+            json js;
+            js["msg"] = REG_MSG;
+            js["name"] = name;
+            js["pwd"] = pwd;
+            string resquest = js.dump();
+
+            int len = send(clientfd, request.c_str(), strlen(request.c_str() + 1), 0);
+            if(len == -1)
+            {
+                cerr << "send reg msg error" << resquest <<endl;
+            }
+
+            sem_wait(&rwsem);
+
+        }
+        break;
+        case 3:// quit
+        {
+            close(clientfd);
+            sem_destroy(&rwsem);
+            exit(0);
+        }
+        break;
+        default:
+            cerr << "invalid input!" <<endl;
+            break;
+        }
     }
     return 0;
+}
+
+//处理注册的响应逻辑
+void doRegResponse(json &responsejs)
+{
+
+}
+
+//处理登录的响应逻辑
+void doLoginResponse(json &responsejs)
+{
+
+}
+
+//子线程 - 接收线程
+void readTaskHandler(int clientfd)
+{
+
+}
+
+//显示当前登录成功用户的基本信息
+void showCurrentUserData()
+{
+
+}
+
+void help(int fd = 0, string str = "");
+
+void chat(int, string);
+
+void addfriend(int, string);
+
+void creategroup(int, string);
+
+void addgroup(int, string);
+
+void groupchat(int, string);
+
+void loginout(int, string);
+
+//系统支持的客户端目录
+unordered_map<string, string> commandMap = {
+
+};
+
+//注册系统支持的客户端命令处理
+unordered_map<string, function<void(int, string)>> commandHandlerMap = {
+
+};
+
+//主聊天页面程序
+void mainMenu(int clientfd)
+{
+    help();
+
+}
+
+
+//获取系统时间
+string getCurrentTime()
+{
+    
 }
