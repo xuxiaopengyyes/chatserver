@@ -1,7 +1,7 @@
 #ifndef REDIS_HPP
-#ifndef REDIS_HPP
+#define REDIS_HPP
 
-#include<hirdis/hiredis.h>
+#include<hiredis/hiredis.h>
 #include<thread>
 #include<functional>
 using namespace std;
@@ -35,10 +35,10 @@ private:
     redisContext* _publish_context;
 
     //hiredis同步上下文对象，负责subscribe消息
-    redisContext* subscribe_context;
+    redisContext* _subscribe_context;
     
     //回调操作，收到订阅的消息，给service层上报
-    funtion<void(int, string)> _notify_message_handler;
+    function<void(int, string)> _notify_message_handler;
 };
 
 #endif

@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     }
 
     //解析命令行参数
-    char* ip = argc[1];
+    char* ip = argv[1];
     uint16_t port = atoi(argv[2]);
 
     signal(SIGINT, resetHandler);

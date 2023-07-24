@@ -3,7 +3,7 @@
 using namespace std;
 
 Redis::Redis()
-    :_publish_context(nullptr),_subcribe_context(nullptr)
+    :_publish_context(nullptr),_subscribe_context(nullptr)
 {
 }
 Redis::~Redis()
@@ -13,9 +13,9 @@ Redis::~Redis()
         redisFree(_publish_context);
     }
     
-    if(_subcribe_context != nullptr)
+    if(_subscribe_context != nullptr)
     {
-        redisFree(_subcribe_context);
+        redisFree(_subscribe_context);
     }
 }
 
@@ -27,15 +27,15 @@ bool Redis::connect()
     if(nullptr == _publish_context)
     {
         cerr << "connect redis failed!" <<endl;
-        redis false;
+        return false;
     }
 
     //负责subscribe订阅消息的上下文连接
-    _subcribe_context = redisConnect("127.0.0.1",6379);
-    if(nullptr == _subcribe_context)
+    _subscribe_context = redisConnect("127.0.0.1",6379);
+    if(nullptr == _subscribe_context)
     {
         cerr << "connect redis failed!" <<endl;
-        redis false;
+        return false;
     }
 
     //在单独的线程中，监听通道上的事件，又消息给业务层进行上报
@@ -63,7 +63,7 @@ bool Redis::publish(int channel, string message)
 //向redis指定的通道subscribe订阅消息
 bool Redis::subscribe(int channel)
 {
-    if(REDIS_ERR == redisAppendCommand(this->_subcribe_context, "SUBSCRIBE %d", channel));
+    if(REDIS_ERR == redisAppendCommand(this->_subscribe_context, "SUBSCRIBE %d", channel));
     {
         cerr << "subscribe command failed!" <<endl;
         return false;
@@ -72,7 +72,7 @@ bool Redis::subscribe(int channel)
     int done = 0;
     while(!done)
     {
-        if(REDIS_ERR == redisBufferWrite(this->_subcribe_context, &done))
+        if(REDIS_ERR == redisBufferWrite(this->_subscribe_context, &done))
         {
             cerr << "subscribe command failed!" <<endl;
             return false;
@@ -85,7 +85,7 @@ bool Redis::subscribe(int channel)
 //向redis指定的通道取消订阅消息
 bool Redis::unsubscribe(int channel)
 {
-    if(REDIS_ERR == redisAppendCommand(this->_subcribe_context, "UNSUBSCRIBE %d", channel));
+    if(REDIS_ERR == redisAppendCommand(this->_subscribe_context, "UNSUBSCRIBE %d", channel));
     {
         cerr << "unsubscribe command failed!" <<endl;
         return false;
@@ -94,7 +94,7 @@ bool Redis::unsubscribe(int channel)
     int done = 0;
     while(!done)
     {
-        if(REDIS_ERR == redisBufferWrite(this->_subcribe_context, &done))
+        if(REDIS_ERR == redisBufferWrite(this->_subscribe_context, &done))
         {
             cerr << "unsubscribe command failed!" <<endl;
             return false;
@@ -108,13 +108,13 @@ bool Redis::unsubscribe(int channel)
 void Redis::observer_channel_message()
 {
     redisReply* reply = nullptr;
-    while(REDIS_OK == redisGetReply(this->_subcribe_context, (void **)&reply))
+    while(REDIS_OK == redisGetReply(this->_subscribe_context, (void **)&reply))
     {
         //订阅收到的消息是一个带三元素的数组
         if(reply != nullptr && reply->element[2] != nullptr && reply->element[2]->str != nullptr)
         {
             //给业务层上报通道上发生的消息
-            _ontify_message_handler(atoi(reply->element[1]->str), reply->element[2]->str);
+            _notify_message_handler(atoi(reply->element[1]->str), reply->element[2]->str);
         }
 
         freeReplyObject(reply);

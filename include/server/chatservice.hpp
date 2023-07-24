@@ -12,7 +12,7 @@ using namespace muduo::net;
 #include "redis.hpp"
 #include "groupmodel.hpp"
 #include "friendmodel.hpp"
-#include "usrmodel.hpp"
+#include "usermodel.hpp"
 #include "offlinemessagemodel.hpp"
 #include "json.hpp"
 using json = nlohmann::json;
@@ -27,21 +27,21 @@ public:
     //获取单例对象接口函数
     static ChatService* instance();
     //处理登录业务
-    void login(const TcpConnectonPtr& conn, json& js, Timestamp time);
+    void login(const TcpConnectionPtr& conn, json& js, Timestamp time);
     //处理注册业务
-    void reg(const TcpConnectonPtr& conn, json& js, Timestamp time);
+    void reg(const TcpConnectionPtr& conn, json& js, Timestamp time);
     //一对一聊天业务
-    void oneChat(const TcpConnectonPtr& conn, json& js, Timestamp time);
+    void oneChat(const TcpConnectionPtr& conn, json& js, Timestamp time);
     //添加好友业务
-    void addFriend(const TcpConnectonPtr& conn, json& js, Timestamp time);
+    void addFriend(const TcpConnectionPtr& conn, json& js, Timestamp time);
     //创建群组业务
-    void createGroup(const TcpConnectonPtr& conn, json& js, Timestamp time);
+    void createGroup(const TcpConnectionPtr& conn, json& js, Timestamp time);
     //加入群组业务
-    void addGroup(const TcpConnectonPtr& conn, json& js, Timestamp time);
+    void addGroup(const TcpConnectionPtr& conn, json& js, Timestamp time);
     //群组聊天业务
-    void groupChat(const TcpConnectonPtr& conn, json& js, Timestamp time);
+    void groupChat(const TcpConnectionPtr& conn, json& js, Timestamp time);
     //处理注销业务
-    void loginout(const TcpConnectonPtr& conn, json& js, Timestamp time);
+    void loginout(const TcpConnectionPtr& conn, json& js, Timestamp time);
     //处理客户端异常退出
     void clientCloseException(const TcpConnectionPtr& conn);
     //服务器异常，业务重置方法
@@ -64,12 +64,12 @@ private:
     
     //数据操作类对象
     UserModel _userModel;
-    OffineMsgModel _offlineMsgModel;
+    OfflineMsgModel _offlineMsgModel;
     FriendModel _friendModel;
     GroupModel _groupModel;
 
     //redis操作对象
     Redis _redis;
-}
+};
 
 #endif

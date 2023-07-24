@@ -22,7 +22,7 @@ public:
     int getId(){ return this->id; }
     string getName(){ return this->name; }
     string getDesc(){ return this->desc; }
-    vector<GroupUser>& getUser(){ return this->users; }
+    vector<GroupUser>& getUsers(){ return this->users; }
     
 private:
     int id;

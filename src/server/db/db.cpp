@@ -3,14 +3,14 @@
 
 // 数据库配置信息
 static string server = "127.0.0.1";
-static string password = "root";
+static string user = "root";
 static string password = "123456";
 static string dbname = "chat";
 
 //初始化数据库连接
 MySQL::MySQL()
 {
-    _conn = mysql_init();
+    _conn = mysql_init(nullptr);
 }
 
 //释放数据库连接资源
@@ -25,7 +25,7 @@ MySQL::~MySQL()
 //连接操作
 bool MySQL::connect()
 {
-    MySQL *p = mysql_real_connect(_conn,server.c_str(),user.c_str(),
+    MYSQL *p = mysql_real_connect(_conn, server.c_str(),user.c_str(),
                         password.c_str(),dbname.c_str(),3306,nullptr,0);
     if(p != nullptr)
     {
@@ -35,17 +35,17 @@ bool MySQL::connect()
     }
     else
     {
-        LOG_INFO << "connect mysql fail!"
+        LOG_INFO << "connect mysql fail!";
     }
     return p;
 }
 
 //更新操作
-bool MYSQL::update(string sql)
+bool MySQL::update(string sql)
 {
     if(mysql_query(_conn,sql.c_str()))
     {
-        LOG_INFO <<__FILE__ << ":" << __LINE << ":"
+        LOG_INFO <<__FILE__ << ":" << __LINE__ << ":"
                 << sql << "更新失败！";
         return false;
     }
@@ -57,7 +57,7 @@ MYSQL_RES *MySQL::query(string sql)
 {
     if(mysql_query(_conn,sql.c_str()))
     {
-        LOG_INFO <<__FILE__ << ":" << __LINE << ":"
+        LOG_INFO <<__FILE__ << ":" << __LINE__ << ":"
                 << sql << "查询失败！";
         return nullptr;
     }

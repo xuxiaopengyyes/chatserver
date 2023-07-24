@@ -28,6 +28,6 @@ protected:
     string name;
     string password;
     string state;
-}
+};
 
 #endif

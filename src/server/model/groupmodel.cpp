@@ -1,5 +1,5 @@
 #include "groupmodel.hpp"
-#include "db.h"
+#include "db.hpp"
 
 
 //创建群组
@@ -17,15 +17,15 @@ bool GroupModel::creatGroup(Group& group)
             return true;
         }
     }
-    return fasle;
+    return false;
 }
 
 //加入群组
-void GroupModel::addGroup(int user, int groupid, string role)
+void GroupModel::addGroup(int userid, int groupid, string role)
 {
     char sql[1024] = {0};
     sprintf(sql, "insert into groupuser values(%d, %d, '%s')",
-    groupid, userid, role.c_str());
+        groupid, userid, role.c_str());
 
     MySQL mysql;
     if(mysql.connect())
